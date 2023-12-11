@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1702232837 source:c:\users\Данил\desktop\Задания по Си\effects\main.c
+	<stdio.h>
+	<tchar.h>
+	<conio.h>
+	<math.h>
+	<stdint.h>
+
