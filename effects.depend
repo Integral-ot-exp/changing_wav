@@ -1,5 +1,12 @@
 # depslib dependency file v1.0
-1702232837 source:c:\users\Данил\desktop\Задания по Си\effects\main.c
+1702385253 source:c:\users\Данил\desktop\Задания по Си\effects\main.c
+	<stdio.h>
+	<tchar.h>
+	<conio.h>
+	<math.h>
+	<stdint.h>
+
+1702300146 source:c:\users\Данил\desktop\Задания по Си\effects\changing_wav\main.c
 	<stdio.h>
 	<tchar.h>
 	<conio.h>
