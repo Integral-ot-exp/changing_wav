@@ -26,7 +26,7 @@ _ERR = 020 /* в данном файле встретилась ошибка */
 };
 int _fillbuf(FILE *);
 int _flushbuf(int, FILE *);
-#define feof(p) (((p)->flag & _EOF) != 0)
+//#define feof(p) (((p)->flag & _EOF) != 0)
 #define ferror(p) (((p)->flag & _ERR) != 0)
 #define fileno(p) ((p)->fd)
 #define getc(p) (--(p)->cnt >= 0 \
@@ -103,34 +103,31 @@ int main()
 {
     FILE *fp;
 
-    //char* name;
-    //scanf("%s", name);
-    fp = fopen("prob.wav", "rb");
-    /*if (fp == NULL)
+    char name;
+    scanf("%s", &name);
+    fp = fopen(&name, "rb");
+    if (fp == NULL)
     {
         printf("Failed open file, error");
         return 0;
-    }*/
+    }
     struct WAVHEADER header;
 
-    printf("1st step\n");
-
-    fread(&header, sizeof(struct WAVHEADER), 1, "prob.wav");
-
-    printf("2nd step\n");
+    fread(&header, sizeof(struct WAVHEADER), 1, fp);
 
     // Выводим полученные данные
     printf("Sample rate: %d\n", header.sampleRate);
     printf("Channels: %d\n", header.numChannels);
     printf("Bits per sample: %d\n", header.bitsPerSample);
-/*
+    printf("chunkSize: %d byte\n", header.chunkSize);
+
     // Посчитаем длительность воспроизведения в секундах
-    float fDurationSeconds = 1.f * header.subchunk2Size / (header.bitsPerSample / 8) / header.numChannels / header.sampleRate;
+    int fDurationSeconds = header.chunkSize / (header.bitsPerSample / 8) / header.numChannels / header.sampleRate;
     int iDurationMinutes = (int)floor(fDurationSeconds) / 60;
     fDurationSeconds = fDurationSeconds - (iDurationMinutes * 60);
-    printf("Duration: %02d:%02.f\n", iDurationMinutes, fDurationSeconds);
-*/
-    fclose("prob.wav");
+    printf("Duration: %02d:%02d\n", iDurationMinutes, fDurationSeconds);
+
+    feof(&name);
     _getch();
     return 0;
 }
