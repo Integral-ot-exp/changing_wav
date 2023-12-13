@@ -1,39 +1,8 @@
 //Эта программа изменяет АЧХ WAV-файлов
 #include <stdio.h>
-#include <tchar.h>
-#include <conio.h>
-#include <math.h>
 #include <stdint.h>
 
-#define EOF (-1)
-//#define BUF_SIZE 1024
-#define OPEN_MAX 20 /* max число одновременно открытых файлов */
-typedef struct iobuf
-{
-    int cnt; /* количество оставшихся символов */
-    char *ptr; /* позиция следующего символа */
-    char *base; /* адрес буфера */
-    int flag; /* режим доступа */
-    int fd; /* дескриптор файла */
-} wavfile;
-extern FILE iob[OPEN_MAX];
-enum _flags {
-_READ =01, /* файл открыт на чтение */
-_WRITE = 02, /* файл открыт на запись */
-_UNBUF = 04, /* файл не буферизуется */
-_EOF = 010, /* в данном файле встретился EOF */
-_ERR = 020 /* в данном файле встретилась ошибка */
-};
-int _fillbuf(FILE *);
-int _flushbuf(int, FILE *);
-//#define feof(p) (((p)->flag & _EOF) != 0)
-#define ferror(p) (((p)->flag & _ERR) != 0)
-#define fileno(p) ((p)->fd)
-#define getc(p) (--(p)->cnt >= 0 \
-? (unsigned char) *(p)->ptr++ : _fillbuf(p))
 
-#define getchar() getc(stdin)
-#define putchar(x) putc((x), stdout)
 // Структура, описывающая заголовок WAV файла.
 struct WAVHEADER
 {
@@ -48,7 +17,7 @@ struct WAVHEADER
     // Это оставшийся размер цепочки, начиная с этой позиции.
     // Иначе говоря, это размер файла - 8, то есть,
     // исключены поля chunkId и chunkSize.
-    uint32_t chunkSize;
+    int32_t chunkSize;
 
     // Содержит символы "WAVE"
     // (0x57415645 в big-endian представлении)
@@ -63,28 +32,28 @@ struct WAVHEADER
 
     // 16 для формата PCM.
     // Это оставшийся размер подцепочки, начиная с этой позиции.
-    uint32_t subchunk1Size;
+    int32_t subchunk1Size;
 
     // Аудио формат, полный список можно получить здесь http://audiocoding.ru/wav_formats.txt
     // Для PCM = 1 (то есть, Линейное квантование).
     // Значения, отличающиеся от 1, обозначают некоторый формат сжатия.
-    uint16_t audioFormat;
+    int16_t audioFormat;
 
     // Количество каналов. Моно = 1, Стерео = 2 и т.д.
-    uint16_t numChannels;
+    int16_t numChannels;
 
     // Частота дискретизации. 8000 Гц, 44100 Гц и т.д.
-    uint32_t sampleRate;
+    int32_t sampleRate;
 
     // sampleRate * numChannels * bitsPerSample/8
-    uint32_t byteRate;
+    int32_t byteRate;
 
     // numChannels * bitsPerSample/8
     // Количество байт для одного сэмпла, включая все каналы.
-    uint16_t blockAlign;
+    int16_t blockAlign;
 
     // Так называемая "глубиная" или точность звучания. 8 бит, 16 бит и т.д.
-    uint16_t bitsPerSample;
+    int16_t bitsPerSample;
 
     // Подцепочка "data" содержит аудио-данные и их размер.
 
@@ -94,7 +63,7 @@ struct WAVHEADER
 
     // numSamples * numChannels * bitsPerSample/8
     // Количество байт в области данных.
-    uint32_t subchunk2Size;
+    int32_t subchunk2Size;
 
     // Далее следуют непосредственно Wav данные.
 };
@@ -122,12 +91,10 @@ int main()
     printf("chunkSize: %d byte\n", header.chunkSize);
 
     // Посчитаем длительность воспроизведения в секундах
-    int fDurationSeconds = header.chunkSize / (header.bitsPerSample / 8) / header.numChannels / header.sampleRate;
-    int iDurationMinutes = (int)floor(fDurationSeconds) / 60;
-    fDurationSeconds = fDurationSeconds - (iDurationMinutes * 60);
-    printf("Duration: %02d:%02d\n", iDurationMinutes, fDurationSeconds);
+    int DurationSeconds = header.chunkSize / (header.bitsPerSample / 8) / header.numChannels / header.sampleRate;
+    int DurationMinutes = DurationSeconds / 60;
+    DurationSeconds = DurationSeconds - (DurationMinutes * 60);
+    printf("Duration: %02d:%02d\n", DurationMinutes, DurationSeconds);
 
-    feof(&name);
-    _getch();
     return 0;
 }
