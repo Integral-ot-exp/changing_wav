@@ -1,98 +1,23 @@
 //Эта программа изменяет АЧХ WAV-файлов
-#include <stdio.h>
-#include <stdint.h>
+#include "struckt.h"
 
-
-// Структура, описывающая заголовок WAV файла.
-struct WAVHEADER
-{
-    // WAV-формат начинается с RIFF-заголовка:
-
-    // Содержит символы "RIFF" в ASCII кодировке
-    // (0x52494646 в big-endian представлении)
-    uint8_t chunkId[4];
-
-    // 36 + subchunk2Size, или более точно:
-    // 4 + (8 + subchunk1Size) + (8 + subchunk2Size)
-    // Это оставшийся размер цепочки, начиная с этой позиции.
-    // Иначе говоря, это размер файла - 8, то есть,
-    // исключены поля chunkId и chunkSize.
-    uint32_t chunkSize;
-
-    // Содержит символы "WAVE"
-    // (0x57415645 в big-endian представлении)
-    uint8_t format[4];
-
-    // Формат "WAVE" состоит из двух подцепочек: "fmt " и "data":
-    // Подцепочка "fmt " описывает формат звуковых данных:
-
-    // Содержит символы "fmt "
-    // (0x666d7420 в big-endian представлении)
-    uint8_t subchunk1Id[4];
-
-    // 16 для формата PCM.
-    // Это оставшийся размер подцепочки, начиная с этой позиции.
-    uint32_t subchunk1Size;
-
-    // Аудио формат, полный список можно получить здесь http://audiocoding.ru/wav_formats.txt
-    // Для PCM = 1 (то есть, Линейное квантование).
-    // Значения, отличающиеся от 1, обозначают некоторый формат сжатия.
-    uint16_t audioFormat;
-
-    // Количество каналов. Моно = 1, Стерео = 2 и т.д.
-    uint16_t numChannels;
-
-    // Частота дискретизации. 8000 Гц, 44100 Гц и т.д.
-    uint32_t sampleRate;
-
-    // sampleRate * numChannels * bitsPerSample/8
-    uint32_t byteRate;
-
-    // numChannels * bitsPerSample/8
-    // Количество байт для одного сэмпла, включая все каналы.
-    uint16_t blockAlign;
-
-    // Так называемая "глубиная" или точность звучания. 8 бит, 16 бит и т.д.
-    uint16_t bitsPerSample;
-
-    // Подцепочка "data" содержит аудио-данные и их размер.
-
-    // Содержит символы "data"
-    // (0x64617461 в big-endian представлении)
-    uint8_t subchunk2Id[4];
-
-    // numSamples * numChannels * bitsPerSample/8
-    // Количество байт в области данных.
-    uint32_t subchunk2Size;
-
-    // Далее следуют непосредственно Wav данные.
-};
 
 int main()
 {
     FILE *fp;
-
-    char name;
-    scanf("%s", &name);
-    fp = fopen(&name, "rb");
-    if (fp == NULL)
-    {
-        printf("Failed open file, error");
-        return 0;
-    }
+    char name[256];
     struct WAVHEADER header;
+
+    scanf("%s", name);
+    printf("name = %s\n", name);
+    fp = fopen(name, "rb");
 
     fread(&header, sizeof(struct WAVHEADER), 1, fp);
 
-    // Выводим полученные данные
-    printf("Sample rate: %d\n", header.sampleRate);
-    printf("Channels: %d\n", header.numChannels);
-    printf("Bits per sample: %d\n", header.bitsPerSample);
-    printf("chunkSize: %d byte\n", header.chunkSize);
+    if (mist(fp) == 0)
+        return 0;
 
-    // Посчитаем длительность воспроизведения в секундах
-    int total = header.chunkSize / (header.bitsPerSample / 8) / header.numChannels / header.sampleRate, secs = total % 60, mins = total / 60;
-
-    printf("Duration: %02d:%02d\n", mins, secs);
+    print(fp);
+    fclose(fp);
     return 0;
 }
