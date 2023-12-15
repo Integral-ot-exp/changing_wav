@@ -1,8 +1,9 @@
-#include "struckt.h"
+#include "wav_head.h"
 
-void print(FILE* fp)
+void print_wav(FILE* fp)
 {
-
+    struct WAVHEADER header;
+    fread(&header, sizeof(struct WAVHEADER), 1, fp);
     // Выводим полученные данные
     printf("Sample rate: %d\n", header.sampleRate);
     printf("Channels: %d\n", header.numChannels);

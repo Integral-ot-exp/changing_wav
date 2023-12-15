@@ -1,23 +1,19 @@
 //Эта программа изменяет АЧХ WAV-файлов
-#include "struckt.h"
-
+#include "wav_head.h"
 
 int main()
 {
     FILE *fp;
     char name[256];
-    struct WAVHEADER header;
 
     scanf("%s", name);
     printf("name = %s\n", name);
     fp = fopen(name, "rb");
 
-    fread(&header, sizeof(struct WAVHEADER), 1, fp);
-
-    if (mist(fp) == 0)
+    if (errors(fp) == false)
         return 0;
-
-    print(fp);
     fclose(fp);
+    fp = fopen(name, "rb");
+    print_wav(fp);
     return 0;
 }

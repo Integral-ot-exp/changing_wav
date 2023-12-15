@@ -6,8 +6,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-bool mist(FILE*);
-void print(FILE*);
+bool errors(FILE*);
+void print_wav(FILE*);
 
 
 // Структура, описывающая заголовок WAV файла.
